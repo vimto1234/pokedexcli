@@ -15,7 +15,10 @@ func main() {
 		if len(inputWords) == 0 {
 			continue
 		}
-		fmt.Printf("Your command was: %v", inputWords[0])
+
+		command := inputWords[0]
+
+		executeCommand(command)
 		fmt.Print("\n")
 	}
 }
