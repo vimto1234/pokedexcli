@@ -33,7 +33,13 @@ func main() {
 
 		command := inputWords[0]
 
-		executeCommand(command)
+		args := []string{}
+
+		if len(inputWords) >= 2 {
+			args = inputWords[1:]
+		}
+
+		executeCommand(command, args)
 		fmt.Print("\n")
 	}
 }

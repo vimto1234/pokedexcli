@@ -49,3 +49,51 @@ func GetLocation(url string, pkc pokecache.Cache) (LocationResult, error) {
 
 	return location, nil
 }
+
+type LocationFull struct {
+	Name              string `json:"name"`
+	PokemonEncounters []struct {
+		Pokemon struct {
+			Name string `json:"name"`
+			URL  string `json:"url"`
+		} `json:"pokemon"`
+	} `json:"pokemon_encounters"`
+}
+
+func ExploreLocation(location string, pkc pokecache.Cache) (LocationFull, error) {
+
+	locationPokemon := LocationFull{}
+
+	url := "https://pokeapi.co/api/v2/location-area/" + location
+
+	c, ok := pkc.Get(url)
+	if ok {
+		if err := json.Unmarshal(c.Val, &locationPokemon); err == nil {
+			return locationPokemon, nil
+		}
+	}
+
+	c, ok = pkc.Get(url)
+	if ok {
+		if err := json.Unmarshal(c.Val, &location); err == nil {
+			return locationPokemon, nil
+		}
+	}
+
+	res, err := http.Get(url)
+	if err != nil {
+		return locationPokemon, fmt.Errorf("error creating request: %w", err)
+	}
+	defer res.Body.Close()
+
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		return locationPokemon, err
+	}
+
+	if err := json.Unmarshal(data, &locationPokemon); err != nil {
+		return locationPokemon, err
+	}
+
+	return locationPokemon, nil
+}

@@ -10,7 +10,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(c *config) error
+	callback    func(c *config, options []string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -35,30 +35,35 @@ func getCommands() map[string]cliCommand {
 			description: "Displays the previous twenty locations in the map",
 			callback:    commandMapB,
 		},
+		"explore": {
+			name:        "explore",
+			description: "Explores a location, displaying pokemon present",
+			callback:    commandExplore,
+		},
 	}
 	return mapOfCommands
 }
 
-func executeCommand(command string) {
+func executeCommand(command string, options []string) {
 	elem, ok := getCommands()[command]
 	if !ok {
 		fmt.Printf("Unknown command '%v'", command)
 		return
 	}
 
-	err := elem.callback(&mainConfig)
+	err := elem.callback(&mainConfig, options)
 	if err != nil {
 		fmt.Print(err)
 	}
 }
 
-func commandExit(c *config) error {
+func commandExit(c *config, options []string) error {
 	fmt.Print("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(c *config) error {
+func commandHelp(c *config, options []string) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
@@ -69,7 +74,7 @@ func commandHelp(c *config) error {
 	return nil
 }
 
-func commandMap(c *config) error {
+func commandMap(c *config, options []string) error {
 	location, err := pokeapi.GetLocation(c.next, c.locationCache)
 	if err != nil {
 		return err
@@ -84,7 +89,7 @@ func commandMap(c *config) error {
 	return nil
 }
 
-func commandMapB(c *config) error {
+func commandMapB(c *config, options []string) error {
 	if c.previous == "" {
 		fmt.Printf("you're on the first page")
 		return nil
@@ -103,5 +108,23 @@ func commandMapB(c *config) error {
 		fmt.Println(loc.Name)
 	}
 
+	return nil
+}
+
+func commandExplore(c *config, options []string) error {
+	if len(options) < 1 {
+		return fmt.Errorf("not enough args")
+	}
+	location, err := pokeapi.ExploreLocation(options[0], c.locationCache)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Exploring %s...\n", location.Name)
+	fmt.Println("Found Pokemon: ")
+
+	for _, pokemon := range location.PokemonEncounters {
+		fmt.Printf(" - %s\n", pokemon.Pokemon.Name)
+	}
 	return nil
 }
