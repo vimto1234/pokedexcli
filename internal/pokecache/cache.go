@@ -12,7 +12,7 @@ type Cache struct {
 
 type cacheEntry struct {
 	createdAt time.Time
-	val       []byte
+	Val       []byte
 }
 
 func NewCache(interval time.Duration) Cache {
@@ -30,7 +30,7 @@ func (c *Cache) Add(key string, entry []byte) {
 	defer c.mu.Unlock()
 	c.entries[key] = cacheEntry{
 		createdAt: time.Now().UTC(),
-		val:       entry,
+		Val:       entry,
 	}
 }
 
@@ -56,7 +56,7 @@ func (c *Cache) reap(invernal time.Duration) {
 	defer c.mu.Unlock()
 	toDelete := []string{}
 	for k, v := range c.entries {
-		if v.createdAt.Add(invernal).After(time.Now()) {
+		if v.createdAt.Before(time.Now().Add(-invernal)) {
 			toDelete = append(toDelete, k)
 		}
 	}

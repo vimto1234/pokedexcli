@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/vimto1234/pokedexcli/internal/pokecache"
 )
 
-type locationResult struct {
+type LocationResult struct {
 	Count    int        `json:"count"`
 	Next     string     `json:"next"`
 	Previous string     `json:"previous"`
@@ -19,9 +21,16 @@ type location struct {
 	Url  string `json:url`
 }
 
-func GetLocation(url string) (locationResult, error) {
+func GetLocation(url string, pkc pokecache.Cache) (LocationResult, error) {
 
-	location := locationResult{}
+	location := LocationResult{}
+
+	c, ok := pkc.Get(url)
+	if ok {
+		if err := json.Unmarshal(c.Val, &location); err == nil {
+			return location, nil
+		}
+	}
 
 	res, err := http.Get(url)
 	if err != nil {

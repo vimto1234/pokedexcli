@@ -70,7 +70,7 @@ func commandHelp(c *config) error {
 }
 
 func commandMap(c *config) error {
-	location, err := pokeapi.GetLocation((c.next))
+	location, err := pokeapi.GetLocation(c.next, c.locationCache)
 	if err != nil {
 		return err
 	}
@@ -92,7 +92,7 @@ func commandMapB(c *config) error {
 
 	fmt.Print("test")
 
-	location, err := pokeapi.GetLocation((c.previous))
+	location, err := pokeapi.GetLocation(c.previous, c.locationCache)
 	if err != nil {
 		return err
 	}

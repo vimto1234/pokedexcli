@@ -4,16 +4,21 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"time"
+
+	"github.com/vimto1234/pokedexcli/internal/pokecache"
 )
 
 type config struct {
-	next     string
-	previous string
+	next          string
+	previous      string
+	locationCache pokecache.Cache
 }
 
 var mainConfig config = config{
-	next:     "https://pokeapi.co/api/v2/location-area/",
-	previous: "",
+	next:          "https://pokeapi.co/api/v2/location-area/",
+	previous:      "",
+	locationCache: pokecache.NewCache(5 * time.Second),
 }
 
 func main() {
