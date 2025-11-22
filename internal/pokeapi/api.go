@@ -19,12 +19,7 @@ type location struct {
 	Url  string `json:url`
 }
 
-var mainConfig config = config{
-	next:     "https://pokeapi.co/api/v2/location-area/",
-	previous: "",
-}
-
-func getLocation(url string) (locationResult, error) {
+func GetLocation(url string) (locationResult, error) {
 
 	location := locationResult{}
 

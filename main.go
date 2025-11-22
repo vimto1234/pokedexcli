@@ -6,6 +6,16 @@ import (
 	"os"
 )
 
+type config struct {
+	next     string
+	previous string
+}
+
+var mainConfig config = config{
+	next:     "https://pokeapi.co/api/v2/location-area/",
+	previous: "",
+}
+
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
